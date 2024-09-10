@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Overcoming the Stability Gap in Continual Learning">
+  <meta name="keywords" content="Stability Gap">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overcoming the Stability Gap in Continual Learning</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Overcoming the Stability Gap in Continual Learning</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://yousuf907.github.io">Md Yousuf Harun</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://chriskanan.com">Christopher Kanan</a><sup>2</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Rochester Institute of Technology,</span>
+            <span class="author-block"><sup>2</sup>University of Rochester</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2306.01904"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/yousuf907/SGM"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Motivation</h2>
+        <div class="content has-text-justified">
+
+          <p>
+            Pre-trained deep neural networks (DNNs) are being widely deployed by industry for making business decisions 
+            and to serve users; however, a major problem is model decay, where the DNN's predictions become more erroneous 
+            over time, resulting in revenue loss or unhappy users. To mitigate model decay, DNNs are retrained from scratch 
+            using old and new data. This is computationally expensive, so retraining happens only once performance has 
+            significantly decreased. Here, we study how continual learning (CL) could potentially overcome model decay in 
+            large pre-trained DNNs and also greatly reduce computational costs for keeping DNNs up-to-date. We identify 
+            the <FONT COLOR="#0072b2"><b><i>stability gap</i></b></FONT> as a major obstacle in our setting. The stability 
+            gap refers to a phenomenon where learning new data causes large drops in performance for past tasks before CL 
+            mitigation methods eventually compensate for this drop. We test two hypotheses to investigate the factors influencing 
+            the stability gap and identify a method that vastly reduces this gap. In large-scale experiments for both easy and 
+            hard CL distributions (e.g., class incremental learning), we demonstrate that our method reduces the stability gap 
+            and greatly increases computational efficiency. Our work aligns CL with the goals of the production setting, where 
+            CL is needed for many applications.
+          </p>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+      <h2 class="title is-3">The Stability Gap</h2>
+      <img src="./static/images/stability_gap_overview_updated.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+      <h2 class="subtitle has-text-justified">    
+        The stability gap is a phenomenon that occurs in CL when learning new data, where accuracy on previously 
+        learned data (Y-axis) drops significantly as a function of training iterations when a new distribution is 
+        introduced (X-axis). Fig.(a) illustrates this behavior during CIL, where a network pre-trained on ImageNet-1K, 
+        learns 365 new classes from Places365-LT over five rehearsal sessions. Each rehearsal session involves 600 
+        iterations that combine samples from the old and new tasks. A gray dotted vertical line marks the end of a 
+        rehearsal session or a task transition. When rehearsal begins, accuracy on the old task for the conventional 
+        rehearsal drops dramatically before slowly recovering, although it fails to recover the original performance on 
+        the old data. The traditional measures of catastrophic forgetting focus on performance at task transitions 
+        (red diamonds), ignoring significant forgetting that occurs during the learning process between task transitions.
+      </h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section"></section>
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+    <!-- Concurrent Work. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Hypotheses for Mitigating the Stability Gap</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            <FONT COLOR="#000000"><b>We test two hypotheses to examine the stability gap in CIL with pre-trained DNNs:</b>
+          <p>
+            <FONT COLOR="#000000"><b><i>1. The stability gap is increased in part due to having a large loss at the output layer for the 
+              new classes.</i></b> To test this hypothesis, we study two methods to mitigate the large loss in the output layer for the new 
+              classes. The first method is to initialize the output layer in a data-driven approach rather than randomly initializing the 
+              output units responsible for the new classes. The second method is a specialized form of soft targets for the network, rather 
+              than the typical hard targets used for the network where these soft targets are designed to improve performance for the new 
+              classes while minimally perturbing others.
+          <p>
+            <FONT COLOR="#000000"><b><i>2. The stability gap is increased in part due to excessive network plasticity.</i></b> We test this 
+              hypothesis by controlling the level of plasticity in network layers in a dynamic manner. For hidden layers, we test this 
+              hypothesis using LoRA (Low Rank Adaptation), which reduces the number of trainable parameters in the hidden layers of the 
+              network. For rehearsal methods, after each rehearsal session, these weights are folded into the original network weights. 
+              For the output layer, we test this hypothesis by freezing the output units for classes seen in earlier batches during rehearsal.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Concurrent Work. -->
+
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Paper video. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Stability Gap Mitigation Methods</h2>
+        <p>
+          <FONT COLOR="#000000"><b>1. Weight Initialization.</b> 
+            In CIL, typically the output units for new classes are randomly initialized causing those units to produce a high loss 
+            during backpropagation. We hypothesize that using data-driven initialization for new class units will reduce the 
+            loss and therefore reduce the stability gap.
+        </p>
+        <p>
+          <FONT COLOR="#000000"><b>2. Hard vs. Dynamic Soft Targets.</b> 
+            Hard targets are one-hot encoded and enforce strict inter-class independence despite several classes sharing distributional 
+            similarities. This property of hard targets, therefore, also causes a large initial loss when learning new classes. 
+            Soft targets, on the other hand, can help the network to retain the joint inter-class distributions, which further ameliorates 
+            the perturbation of learned classes. To test this, we use soft targets constructed such that the model's predictions on previously 
+            learned classes are largely preserved.
+        </p>
+        <h2 class="title is-3">Dynamic Soft Targets</h2>
+          <img src="./static/images/soft_targets_update.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+          <p>
+            <FONT COLOR="#000000"><b>3. Limiting Hidden Layer Plasticity Using LoRA.</b> 
+            We inject LoRA weights into the linear layers of the network, and only these parameters and the output layer are updated 
+            during rehearsal. At the end of the rehearsal session the LoRA parameters are folded into the network.
+            This prevents excessively perturbation of hidden representations, reducing the stability gap.
+          </p>
+          <p>
+            <FONT COLOR="#000000"><b>4. Limiting Output Layer Plasticity via Targeted Freezing.</b> 
+              While LoRA restricts plasticity in hidden representations, we hypothesize that restricting plasticity 
+              in the output layer could also be helpful. We refer to this technique as old output class freezing (OOCF).
+          </p>
+          <p>
+            <FONT COLOR="#000000"><b>Combining Mitigation Methods & SGM.</b> 
+             We refer to the method that combines dynamic soft targets, weight initialization, OOCF, and LoRA as SGM (Stability Gap Mitigation).
+          </p>
+      </div>
+    </div>
+    <!--/ Paper video. -->
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Paper video. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">SGM Enhances Stability and Efficiency</h2>
+        <p>
+          After pre-training on ImageNet-1K, the model learns 365 new classes from Places365-LT over five rehearsal sessions.
+
+          <b>(a) Stability Gap.</b> SGM quickly recovers old performance on ImageNet-1K at the beginning of CL whereas vanilla fails to obtain full recovery. 
+          After each rehearsal session (vertical dotted gray line), the final accuracy (%) is highlighted by 
+          diamond (SGM), star (joint model), and square (vanilla). The joint model (upper bound) is jointly trained on 
+          ImageNet-1K and seen CL batches from the Places365-LT dataset.
+          
+          <b>(b) Computational Efficiency.</b> 
+          SGM provides a 16.7X speedup in number of network updates compared to a joint model (upper bound) with the combined 1365 class 
+          dataset (ImageNet-1K and Places365-LT combined). For SGM and conventional rehearsal, we show the stability gap in the learning curve 
+          averaged over rehearsal sessions.
+        </p>
+        <h2 class="title is-3">(a) Stability Gap</h2>
+          <img src="./static/images/learning_curve_all_sessions.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+          <h2 class="title is-3">(b) Computational Efficiency</h2>
+          <img src="./static/images/sgm_intro.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+      </div>
+    </div>
+    <!--/ Paper video. -->
+  </div>
+</section>
+
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Evaluating Our Hypotheses</h2>
+      Mitigation methods averaged over 5 rehearsal sessions during CIL.
+        <p>
+          (a) The loss on new classes when only training the output layer, which reveals soft targets and data-driven weight 
+          initialization greatly reduce the initial loss. 
+        </p>
+        <p>
+          (b) Accuracy on ImageNet-1K for hard vs. soft targets, which shows that soft targets reduce the stability gap. 
+        </p>
+        <p>
+          (c) Network plasticity increases the stability gap.
+        </p>
+        <p>
+          (d-f) Accuracy on new, old, and all classes.
+        </p>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-steve">
+          <h2 class="title is-3">(a) Initial Loss</h2>
+          <img src="./static/images/loss_new_output_layer.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+        <div class="item item-chair-tp">
+          <h2 class="title is-3">(b) Soft Targets</h2>
+          <img src="./static/images/hard_vs_soft.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+        <div class="item item-shiba">
+          <h2 class="title is-3">(c) Plasticity</h2>
+          <img src="./static/images/plastic_layers_updated.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+        <div class="item item-fullbody">
+          <h2 class="title is-3">(d) New Classes</h2>
+          <img src="./static/images/comp_acc_new2.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+        <div class="item item-fullbody">
+          <h2 class="title is-3">(e) Old Classes</h2>
+          <img src="./static/images/comp_acc_old2.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+        <div class="item item-fullbody">
+          <h2 class="title is-3">(f) All Classes</h2>
+          <img src="./static/images/comp_acc_all2.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <!-- Visual Effects. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Learning Efficiency</h2>
+          <p align="justify">
+            <b>Speed of acquiring new knowledge.</b> SGM requires fewer network updates and TFLOPs than vanilla to 
+            reach 99% of the best accuracy on new classes (highlighted).
+          </p>
+          <img src="./static/images/speed_flops_new.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+      </div>
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+      <div class="column">
+        <h2 class="title is-3">FLOPs Analysis</h2>
+        <div class="columns is-centered">
+          <div class="column content">
+            <p align="justify">
+              With sparse updates, SGM significantly reduces FLOPs, improving compute efficiency.
+              SGM provides a 31.9X speedup in TFLOPs compared to a joint model (upper bound) with the combined 1365 class 
+              dataset (ImageNet-1K and Places365-LT combined). For SGM and conventional rehearsal, we show the stability 
+              gap in the learning curve averaged over rehearsal sessions.
+            </p>
+            <img src="./static/images/sgm_flops.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Matting. -->          
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+      <h2 class="title is-3">SGM Enhances Non-rehearsal Methods</h2>
+      <img src="./static/images/lwf_lora.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+      <h2 class="subtitle has-text-justified">  
+        The Y-axis shows an average accuracy of 6 runs with a standard deviation (shaded region). 
+        The network is trained on ImageNet-1K and then learns 365 new classes from Places-LT over five batches. 
+        When a new batch arrives, accuracy on ImageNet-1k for LwF plummets. 
+        LwF fails to recover performance and ends up with a large stability gap. In contrast, LwF with SGM does not plummet 
+        like LwF and shows better performance throughout the CL phase with a significantly reduced stability gap.
+      </h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="section" id="ACKNOWLEDGMENTS">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Acknowledgements</h2>
+    <p>
+      <b>This work was partly supported by NSF awards #1909696, #2326491, #2125362, and #2317706.</b>
+    </p>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{harun2023overcoming,
+  title     = {Overcoming the Stability Gap in Continual Learning},
+  author    = {Harun, Md Yousuf and Kanan, Christopher},
+  journal   = {arXiv preprint arXiv:2306.01904},
+  year      = {2023}
+  }</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/yousuf907" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p> 
+            This website is adapted from <a
+              href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>,
+              licensed under a <a rel="license"
+                                  href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
