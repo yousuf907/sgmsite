@@ -106,11 +106,11 @@
             and to serve users; however, a major problem is model decay, where the DNN's predictions become more erroneous 
             over time, resulting in revenue loss or unhappy users. To mitigate model decay, DNNs are retrained from scratch 
             using old and new data. This is computationally expensive, so retraining happens only once performance has 
-            significantly decreased. Here, we study how continual learning (CL) could potentially overcome model decay in 
-            large pre-trained DNNs and also greatly reduce computational costs for keeping DNNs up-to-date. We identify 
-            the <FONT COLOR="#0072b2"><b><i>stability gap</i></b></FONT> as a major obstacle in our setting. The stability 
-            gap refers to a phenomenon where learning new data causes large drops in performance for past tasks before CL 
-            mitigation methods eventually compensate for this drop. We test two hypotheses to investigate the factors influencing 
+            significantly decreased. <FONT COLOR="#A65628"><b>Here, we study how continual learning (CL) could potentially 
+            overcome model decay in large pre-trained DNNs and also greatly reduce computational costs for keeping DNNs up-to-date.</b></FONT> 
+            <FONT COLOR="#0072b2"><b>We identify the <i>stability gap</i> as a major obstacle in our setting. The stability gap 
+            refers to a phenomenon where learning new data causes large drops in performance for past tasks before CL mitigation 
+            methods eventually compensate for this drop.</b></FONT> We test two hypotheses to investigate the factors influencing 
             the stability gap and identify a method that vastly reduces this gap. In large-scale experiments for both easy and 
             hard CL distributions (e.g., class incremental learning), we demonstrate that our method reduces the stability gap 
             and greatly increases computational efficiency. Our work aligns CL with the goals of the production setting, where 
@@ -162,14 +162,14 @@
           <p>
             <FONT COLOR="#000000"><b>We test two hypotheses to examine the stability gap in CIL with pre-trained DNNs:</b>
           <p>
-            <FONT COLOR="#000000"><b><i>1. The stability gap is increased in part due to having a large loss at the output layer for the 
-              new classes.</i></b> To test this hypothesis, we study two methods to mitigate the large loss in the output layer for the new 
+            <FONT COLOR="#A65628"><b><i>1. The stability gap is increased in part due to having a large loss at the output layer for the 
+              new classes.</i></b></FONT> To test this hypothesis, we study two methods to mitigate the large loss in the output layer for the new 
               classes. The first method is to initialize the output layer in a data-driven approach rather than randomly initializing the 
               output units responsible for the new classes. The second method is a specialized form of soft targets for the network, rather 
               than the typical hard targets used for the network where these soft targets are designed to improve performance for the new 
               classes while minimally perturbing others.
           <p>
-            <FONT COLOR="#000000"><b><i>2. The stability gap is increased in part due to excessive network plasticity.</i></b> We test this 
+            <FONT COLOR="#A65628"><b><i>2. The stability gap is increased in part due to excessive network plasticity.</i></b></FONT> We test this 
               hypothesis by controlling the level of plasticity in network layers in a dynamic manner. For hidden layers, we test this 
               hypothesis using LoRA (Low Rank Adaptation), which reduces the number of trainable parameters in the hidden layers of the 
               network. For rehearsal methods, after each rehearsal session, these weights are folded into the original network weights. 
@@ -191,13 +191,13 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3">Stability Gap Mitigation Methods</h2>
         <p>
-          <FONT COLOR="#000000"><b>1. Weight Initialization.</b> 
+          <FONT COLOR="#0072b2"><b>1. Weight Initialization.</b></FONT> 
             In CIL, typically the output units for new classes are randomly initialized causing those units to produce a high loss 
             during backpropagation. We hypothesize that using data-driven initialization for new class units will reduce the 
             loss and therefore reduce the stability gap.
         </p>
         <p>
-          <FONT COLOR="#000000"><b>2. Hard vs. Dynamic Soft Targets.</b> 
+          <FONT COLOR="#0072b2"><b>2. Hard vs. Dynamic Soft Targets.</b></FONT> 
             Hard targets are one-hot encoded and enforce strict inter-class independence despite several classes sharing distributional 
             similarities. This property of hard targets, therefore, also causes a large initial loss when learning new classes. 
             Soft targets, on the other hand, can help the network to retain the joint inter-class distributions, which further ameliorates 
@@ -209,18 +209,18 @@
           class="interpolation-image"
           alt="Interpolation end reference image."/>
           <p>
-            <FONT COLOR="#000000"><b>3. Limiting Hidden Layer Plasticity Using LoRA.</b> 
+            <FONT COLOR="#0072b2"><b>3. Limiting Hidden Layer Plasticity Using LoRA.</b></FONT> 
             We inject LoRA weights into the linear layers of the network, and only these parameters and the output layer are updated 
             during rehearsal. At the end of the rehearsal session the LoRA parameters are folded into the network.
             This prevents excessively perturbation of hidden representations, reducing the stability gap.
           </p>
           <p>
-            <FONT COLOR="#000000"><b>4. Limiting Output Layer Plasticity via Targeted Freezing.</b> 
+            <FONT COLOR="#0072b2"><b>4. Limiting Output Layer Plasticity via Targeted Freezing.</b></FONT> 
               While LoRA restricts plasticity in hidden representations, we hypothesize that restricting plasticity 
               in the output layer could also be helpful. We refer to this technique as old output class freezing (OOCF).
           </p>
           <p>
-            <FONT COLOR="#000000"><b>Combining Mitigation Methods & SGM.</b> 
+            <FONT COLOR="#0072b2"><b>Combining Mitigation Methods & SGM.</b></FONT> 
              We refer to the method that combines dynamic soft targets, weight initialization, OOCF, and LoRA as SGM (Stability Gap Mitigation).
           </p>
       </div>
@@ -281,7 +281,7 @@
           (c) Network plasticity increases the stability gap.
         </p>
         <p>
-          (d-f) Accuracy on new, old, and all classes.
+          (d-f) Stability-plasticity. Accuracy on new, old, and all classes.
         </p>
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item item-steve">
@@ -366,7 +366,94 @@
         </div>
       </div>
     </div>
-    <!--/ Matting. -->          
+    <!--/ Matting. -->  
+    
+    
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <!-- Visual Effects. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Class Incremental Learning & IID Orderings</h2>
+          <p align="justify">
+            Following figure shows results after learning ImageNet-1K followed by Places365-LT over 5 rehearsal sessions.
+            Reported is the final accuracy (%) on all 1365 classes. SGM outperforms vanilla across
+            various data orderings.
+          </p>
+          <img src="./static/images/sgm_cil_iid.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+      </div>
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+      <div class="column">
+        <h2 class="title is-3">Offline Continual Learning</h2>
+        <div class="columns is-centered">
+          <div class="column content">
+            <p align="justify">
+              To study SGM's efficacy under storage constraints, we combine it with two popular rehearsal methods, DERpp
+              and GDumb. Following figure shows results for class incremental learning on a combination of ImageNet-1K 
+              and Places365-Standard (3 Million images). Reported is the final accuracy (%) on all 1365 classes. 
+              SGM significantly improves each method's performance.
+            </p>
+            <img src="./static/images/sgm_offline_cl.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Matting. -->  
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <!-- Visual Effects. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Online Continual Learning</h2>
+          <p align="justify">
+            We assess SGM's efficacy in an online continual learning setting using a state-of-the-art method, REMIND.
+            After being pre-trained on ImageNet-1K, a model learns CUB-200 in sample-by-sample manner.
+            In terms of final accuracy (%) on all 1200 classes, SGM combined with REMIND significantly 
+            outperforms standalone REMIND.
+          </p>
+          <img src="./static/images/sgm_online_cl.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+        </div>
+      </div>
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+      <div class="column">
+        <h2 class="title is-3">Rehearsal-Free Setting</h2>
+        <div class="columns is-centered">
+          <div class="column content">
+            <p align="justify">
+              To examine if SGM would be helpful for non-rehearsal methods such as Learning without Forgetting (LwF),
+              we compare LwF with a version of LwF that uses SGM without rehearsal during 
+              class incremental learning of ImageNet-1K and Places365-LT. Reported is the final accuracy (%) on 1365 classes. 
+              Results show that SGM is effective in both rehearsal and rehearsal-free settings.
+            </p>
+            <img src="./static/images/sgm_lwf.png"
+          class="interpolation-image"
+          alt="Interpolation end reference image."/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Matting. -->   
 
 
 <section class="section">
